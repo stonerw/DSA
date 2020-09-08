@@ -6,47 +6,49 @@ import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Date;
 
 import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 
-class RSA {
+import sun.security.provider.DSAPrivateKey;
+import sun.security.provider.DSAPublicKey;
+import java.util.Date;
+
+
+class DSA {
     private static String src = "security";
     public static void main(String[] args) {
         long startTime = new Date().getTime();
-        jdkRSA();
+        jdkDSA();
         long endTime = new Date().getTime();
         System.out.println("This program runs in " + (endTime - startTime)
                 + "MS" );
     }
 
-    public static void jdkRSA(){
+    public static void jdkDSA(){
         try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("DSA");
             keyPairGenerator.initialize(512);
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
-            RSAPublicKey rsaPublicKey = (RSAPublicKey) keyPair.getPublic();
-            RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) keyPair.getPrivate();
+            DSAPublicKey dsaPublicKey = (DSAPublicKey)keyPair.getPublic();
+            DSAPrivateKey dsaPrivateKey = (DSAPrivateKey)keyPair.getPrivate();
 
 
-            PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(rsaPrivateKey.getEncoded());
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(dsaPrivateKey.getEncoded());
+            KeyFactory keyFactory = KeyFactory.getInstance("DSA");
             PrivateKey privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec);
-            java.security.Signature signature = java.security.Signature.getInstance("MD5withRSA");
+            Signature signature = Signature.getInstance("SHA1withDSA");
             signature.initSign(privateKey);
             signature.update(src.getBytes());
             byte[] res = signature.sign();
-            System.out.println("signature:"+HexBin.encode(res));
+            System.out.println("signature："+HexBin.encode(res));
 
-
-            X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(rsaPublicKey.getEncoded());
-            keyFactory.getInstance("RSA");
+            X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(dsaPublicKey.getEncoded());
+            keyFactory = KeyFactory.getInstance("DSA");
             PublicKey publicKey = keyFactory.generatePublic(x509EncodedKeySpec);
-            signature = Signature.getInstance("MD5withRSA");
+            signature = Signature.getInstance("SHA1withDSA");
             signature.initVerify(publicKey);
             signature.update(src.getBytes());
             boolean bool = signature.verify(res);
@@ -56,5 +58,6 @@ class RSA {
         }
 
     }
-
 }
+
+
